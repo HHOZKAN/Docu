@@ -1,5 +1,7 @@
-import { Routes, Route } from 'react-router-dom'
-import Sidebar from './components/Sidebar'
+import { Routes, Route, useLocation } from 'react-router-dom'
+import FloatingTOC from './components/FloatingTOC'
+
+// Imports des pages
 import Home from './pages/Home'
 import Architecture from './pages/linux/Architecture'
 import CommandesDeBase from './pages/linux/CommandesDeBase'
@@ -30,10 +32,33 @@ import Diagnostic from './pages/django/Diagnostic'
 import Cheatsheets from './pages/Cheatsheets'
 
 export default function App() {
+  // On récupère l'URL actuelle
+  const location = useLocation()
+
+  // On vérifie si on est sur la page d'accueil ("/")
+  const isHome = location.pathname === '/'
+
   return (
-    <div className="app-layout">
-      <Sidebar />
-      <main className="main-content">
+    <div className="min-h-screen bg-white selection:bg-gray-200 selection:text-gray-900">
+
+      {/* Le marque-page discret et déplaçable */}
+      <FloatingTOC />
+
+      {/* Le conteneur principal s'adapte dynamiquement :
+        - Sur l'accueil : max-w-[1600px] (Couvre presque tout l'écran)
+        - Sur les cours : max-w-3xl (Reste étroit pour faciliter la lecture)
+      */}
+      <main className={`mx-auto px-6 md:px-12 py-12 md:py-20 w-full transition-all duration-500 ease-in-out ${isHome ? 'max-w-[1600px]' : 'max-w-3xl'}`}>
+
+        {/* On n'affiche le fil d'ariane "Retour" que si on n'est PAS sur l'accueil */}
+        {!isHome && (
+          <div className="mb-12">
+            <a href="/" className="text-gray-400 hover:text-gray-900 transition-colors text-sm flex items-center gap-2 w-fit">
+              <span>←</span> Retour au journal
+            </a>
+          </div>
+        )}
+
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/linux/architecture" element={<Architecture />} />
@@ -64,6 +89,7 @@ export default function App() {
           <Route path="/django/diagnostic" element={<Diagnostic />} />
           <Route path="/cheatsheets" element={<Cheatsheets />} />
         </Routes>
+
       </main>
     </div>
   )
